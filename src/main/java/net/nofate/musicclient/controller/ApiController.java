@@ -13,12 +13,10 @@ public class ApiController {
     @Autowired
     public ApiController(MusicService musicService) {
         this.musicService = musicService;
-
-//        MusicServiceConfig musicServiceConfig = new MusicServiceConfig();
     }
 
 
-    @GetMapping({"/api"}) // TODO group /api route
+    @GetMapping({"/api"}) // TODO: group /api route
     public String home() {
         return "";
     }
@@ -42,9 +40,11 @@ public class ApiController {
 //            e.printStackTrace();
             switch (e.getMessage()) {
                 case "track_exists":
-                    throw new ResponseStatusException(409, "This Track already exists!", null);
+                    throw new ResponseStatusException(409, "This Track already exists.", null);
+                case "track_remote_not_found":
+                    throw new ResponseStatusException(404, "Remote Track not found.", null);
                 default:
-                    throw new ResponseStatusException(400, "Unknown error", null); // TODO find best status code
+                    throw new ResponseStatusException(400, "Unknown error", null); // TODO: find best status code
             }
         }
     }

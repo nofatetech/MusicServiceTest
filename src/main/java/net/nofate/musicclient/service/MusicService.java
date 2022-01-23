@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 public class MusicService {
 
     private final TrackRepository trackRepository;
-    private SpotifyApiService spotifyApiService;
+
+    private final SpotifyApiService spotifyApiService;
 
     @Autowired
     public MusicService(TrackRepository trackRepository, SpotifyApiService spotifyApiService) {
