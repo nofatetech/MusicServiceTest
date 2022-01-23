@@ -3,10 +3,7 @@ package net.nofate.musicclient.controller;
 import net.nofate.musicclient.model.Track;
 import net.nofate.musicclient.service.MusicService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -16,12 +13,20 @@ public class ApiController {
     @Autowired
     public ApiController(MusicService musicService) {
         this.musicService = musicService;
+
+//        MusicServiceConfig musicServiceConfig = new MusicServiceConfig();
     }
 
 
-    @GetMapping({"/api"})
+    @GetMapping({"/api"}) // TODO group /api route
     public String home() {
         return "";
+    }
+
+    @GetMapping({"/api/tracks/find"})
+    public Track tracksGetOne(@RequestParam("isrc") String isrc) {
+//        @PathVariable("objectId") Long objectId;
+        return this.musicService.tracksGetOne(isrc);
     }
 
     @GetMapping({"/api/tracks"})

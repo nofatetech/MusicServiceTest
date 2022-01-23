@@ -1,25 +1,20 @@
 package net.nofate.musicclient.service;
 
 import net.nofate.musicclient.data.TrackRepository;
-import net.nofate.musicclient.model.MusicServiceConfig;
 import net.nofate.musicclient.model.Track;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+@Service
 public class MusicService {
 
-    @Autowired
     private final TrackRepository trackRepository;
-    private final MusicServiceConfig musicServiceConfig;
-//    private final ArtistRepository artistRepository;
-//     CRUDs for tracks, artists, etc.
+    private SpotifyApiService spotifyApiService;
 
-    public MusicService(TrackRepository trackRepository, MusicServiceConfig musicServiceConfig) {
+    @Autowired
+    public MusicService(TrackRepository trackRepository, SpotifyApiService spotifyApiService) {
         this.trackRepository = trackRepository;
-        this.musicServiceConfig = musicServiceConfig;
+        this.spotifyApiService = spotifyApiService;
     }
 
     public Iterable<Track> tracksGetAll() {
@@ -27,13 +22,30 @@ public class MusicService {
         return tracks;
     }
 
-    public Track tracksCreate(@RequestParam("isrc") String isrc) throws Exception {
-        Track localItem = this.trackRepository.findByIsrc(isrc);
-        if (null != localItem) {
-            throw new Exception("track_exists"); // TODO enum or else for status codes..
+    public Track tracksCreate(String isrc) throws Exception {
+        Track titem = this.trackRepository.findByIsrc(isrc);
+        if (null != titem) {
+            throw new Exception("track_exists"); // TODO enum or else for list of return status codes..
         } else {
+            se.michaelthelin.spotify.model_objects.specification.Track remoteTrack = this.spotifyApiService.findTrack(isrc);
+            if (null == remoteTrack) {
+                throw new Exception("track_remote_not_found");
+            } else {
 
+                Track newTrack = new Track();
+                newTrack.setIsrc(isrc);
+                newTrack.setName(remoteTrack.getName());
+                newTrack.setDuration(remoteTrack.getDurationMs());
+                newTrack.setExplicit(remoteTrack.getIsExplicit());
+
+                this.trackRepository.save(newTrack);
+
+                return newTrack;
+            }
         }
-        return null;
+    }
+
+    public Track tracksGetOne(String isrc) {
+        return this.trackRepository.findByIsrc(isrc);
     }
 }
