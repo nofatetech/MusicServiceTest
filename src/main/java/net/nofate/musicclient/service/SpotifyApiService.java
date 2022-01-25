@@ -2,6 +2,7 @@ package net.nofate.musicclient.service;
 
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -16,9 +17,10 @@ import java.io.IOException;
 @Service
 public class SpotifyApiService {
 
-    @Value("${spotify.client-id}") String spotifyClientId;
-    @Value("${spotify.client-secret}") String spotifyClientSecret;
+//    @Value("${spotify.client-id}") String spotifyClientId;
+//    @Value("${spotify.client-secret}") String spotifyClientSecret;
     @Autowired
+    @Qualifier("spotApi1")
     SpotifyApi spotifyApi;
 
 //    public SpotifyClientService() {
@@ -44,20 +46,23 @@ public class SpotifyApiService {
     }
 
 
-    public Track findTrack(String q) {
+    public Track findTrack(String q) throws Exception {
+        System.out.println("?????? FINDTRACK ");
         this.clientCredentialsSync();
 
         try {
             SearchTracksRequest searchTracksRequest = this.spotifyApi.searchTracks("isrc:" + q).build();
             Paging trackPaging = searchTracksRequest != null ? searchTracksRequest.execute() : null;
+            System.out.println("isrc: " + q);
+            System.out.println("Total: " + trackPaging.getTotal());
+            System.out.println("Items: " + trackPaging.getItems().length);
             if (trackPaging != null && trackPaging.getTotal() > 0) {
-                System.out.println("Total: " + trackPaging.getTotal());
                 return ((Track[])trackPaging.getItems())[0];
             }
             return null;
         } catch (Exception e) {
-            return null;
-
+            System.out.println("?????? ERROR "+ e.getMessage());
+            throw new Exception(e.getMessage());
         }
 
     }

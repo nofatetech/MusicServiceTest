@@ -28,7 +28,12 @@ public class MusicService {
         if (null != titem) {
             throw new Exception("track_exists"); // TODO enum or else for list of return status codes..
         } else {
-            se.michaelthelin.spotify.model_objects.specification.Track remoteTrack = this.spotifyApiService.findTrack(isrc);
+            se.michaelthelin.spotify.model_objects.specification.Track remoteTrack = null;
+            try {
+                remoteTrack = this.spotifyApiService.findTrack(isrc);
+            } catch (Exception e) {
+                System.out.println(">>>>>>>>>>> EXCEPTION "+ e.getMessage());
+            }
             if (null == remoteTrack) {
                 throw new Exception("track_remote_not_found");
             } else {
@@ -47,6 +52,7 @@ public class MusicService {
     }
 
     public Track tracksGetOne(String isrc) {
+        System.out.println(">>>>>>>>>>>> tracksGetOne "+isrc);
         return this.trackRepository.findByIsrc(isrc);
     }
 }

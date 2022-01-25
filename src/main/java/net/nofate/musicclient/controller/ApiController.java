@@ -18,13 +18,18 @@ public class ApiController {
 
     @GetMapping({"/api"}) // TODO: group /api route
     public String home() {
-        return "";
+        return "apihome";
     }
 
     @GetMapping({"/api/tracks/find"})
     public Track tracksGetOne(@RequestParam("isrc") String isrc) {
 //        @PathVariable("objectId") Long objectId;
-        return this.musicService.tracksGetOne(isrc);
+        var titem = this.musicService.tracksGetOne(isrc);
+        if (null != titem) {
+            return titem;
+        } else {
+            throw new ResponseStatusException(404, "Track not found.", null);
+        }
     }
 
     @GetMapping({"/api/tracks"})
@@ -44,7 +49,7 @@ public class ApiController {
                 case "track_remote_not_found":
                     throw new ResponseStatusException(404, "Remote Track not found.", null);
                 default:
-                    throw new ResponseStatusException(400, "Unknown error", null); // TODO: find best status code
+                    throw new ResponseStatusException(400, "EXCEPTION: " + e.getMessage(), null); // TODO: find best status code
             }
         }
     }
